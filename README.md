@@ -2,7 +2,7 @@
 
 # 🛰️ /ec2-remote-access
 
-### **Convierte cualquier máquina en una ventana a tu Claude Code remoto en EC2.**
+### **Convierte cualquier máquina en una ventana a tu Claude Code corriendo en EC2.**
 
 [![Skill](https://img.shields.io/badge/skill-claude_code-blue?style=flat-square)](#)
 [![Transport](https://img.shields.io/badge/transport-SSH_+_Tailscale-success?style=flat-square)](#)
@@ -10,30 +10,109 @@
 [![Setup](https://img.shields.io/badge/setup-3_minutos-brightgreen?style=flat-square)](#)
 [![License](https://img.shields.io/badge/license-MIT-lightgrey?style=flat-square)](LICENSE)
 
-**Una compu nueva. Tres minutos. Un comando para siempre: `ec2-tmux`.**
+**3 minutos. 5 comandos. Después: `ec2-tmux` desde cualquier terminal — Claude Code remoto persistente.**
 
 </div>
 
 ---
 
-## 🚀 Instalación (1 línea)
+## 🚀 Instalación — los 5 pasos exactos
 
-En la máquina nueva donde quieras configurar el acceso remoto:
+**Estás en una compu nueva (Mac / Linux).** Ejecútalos en orden:
+
+### 1️⃣ Instalar Claude Code en esta máquina
+
+```bash
+curl -fsSL https://claude.ai/install.sh | bash
+```
+
+Verifica:
+
+```bash
+claude --version
+# → 2.1.144 (Claude Code)  ← o versión similar
+```
+
+> Alternativa GUI: descarga la app .dmg desde **https://claude.ai/code**
+
+---
+
+### 2️⃣ Autenticar Claude Code
+
+```bash
+claude
+```
+
+Te abre el navegador → login con tu cuenta Anthropic → vuelves al terminal autenticado.
+Sal con `Ctrl+D` (o `/exit`) y pasa al Paso 3.
+
+---
+
+### 3️⃣ Instalar el skill `/ec2-remote-access`
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/durang/ec2-remote-access/master/install.sh | bash
 ```
 
-Después:
+Output esperado:
 
-```bash
-claude                # abre Claude Code
-/ec2-remote-access    # invoca el skill
+```
+▶ Installing /ec2-remote-access skill
+  Target: ~/.claude/skills/ec2-remote-access
+  → SKILL.md
+  → README.md
+
+✅ Installed.
 ```
 
-El skill te guía paso a paso (Tailscale, SSH key, aliases) verificando cada paso. Al final tienes 7 aliases listos y `ec2-tmux` te conecta a Claude Code en tu EC2.
+---
 
-> **Requisito:** tener Claude Code instalado en la máquina nueva (`https://claude.ai/code`). El skill se instala en `~/.claude/skills/ec2-remote-access/`.
+### 4️⃣ Abrir Claude Code
+
+```bash
+claude
+```
+
+---
+
+### 5️⃣ Invocar el skill — dentro de Claude
+
+```
+/ec2-remote-access
+```
+
+El skill te pregunta 4 datos:
+
+```
+1. ¿OS de esta máquina?     (Mac / Linux / Windows-WSL)
+2. ¿Hostname Tailscale del EC2?  (ej: jarvis-v3, mi-servidor)
+3. ¿Usuario SSH del EC2?    (default: ec2-user)
+4. ¿Home dir del EC2?       (default: /home/ec2-user)
+```
+
+Y te guía paso a paso (Tailscale, SSH key, aliases) verificando cada paso. Al terminar tienes 7 aliases listos:
+
+```bash
+ec2-tmux       # ⭐ sesión Claude Code remota PERSISTENTE (sobrevive cierres de laptop / WiFi)
+ec2            # sesión nueva (no persistente)
+ec2-continue   # retomar última sesión
+ec2-resume     # menú de sesiones previas
+ec2-shell      # solo terminal del EC2 (sin Claude)
+ec2-tmux-2/3   # sesiones tmux paralelas
+```
+
+---
+
+## ⚡ Los 5 comandos en orden (copy-paste ready)
+
+```bash
+curl -fsSL https://claude.ai/install.sh | bash                                                # 1. instalar Claude Code
+claude                                                                                         # 2. authenticate (login browser) — sal con Ctrl+D
+curl -fsSL https://raw.githubusercontent.com/durang/ec2-remote-access/master/install.sh | bash # 3. instalar skill
+claude                                                                                         # 4. abrir Claude Code
+# Dentro de Claude:                                                                            # 5. invocar skill
+/ec2-remote-access
+```
 
 ---
 
@@ -42,7 +121,7 @@ El skill te guía paso a paso (Tailscale, SSH key, aliases) verificando cada pas
 Te abre Claude Code corriendo en tu EC2 — con todo tu stack (memoria, agentes, MCPs, secrets) — desde **cualquier máquina nueva**, sin re-instalar nada del stack.
 
 ```bash
-# En máquina nueva, después de configurar (1 sola vez):
+# Después del setup, desde cualquier terminal:
 $ ec2-tmux
 
 # Te aparece esto, igual que si estuvieras enfrente del EC2:
@@ -54,7 +133,7 @@ Claude Code 2.1.144
 
 **Antes:** abrías terminal, recordabas IP, esperabas password, manualmente cargabas `claude`, y si se caía el WiFi perdías todo el contexto.
 
-**Después:** tecleas `ec2-tmux` y estás dentro. Caes WiFi, regresas, mismo comando, mismo estado.
+**Después:** tecleas `ec2-tmux` y estás dentro. Cierra laptop / cae WiFi → regresas, mismo comando, mismo estado exacto.
 
 ---
 
@@ -86,19 +165,6 @@ Si tu cerebro vive en un EC2 (memoria + agentes + MCPs), tu acceso a él no pued
 | 7  | Crea 7 aliases en tu shell            | `ec2`, `ec2-tmux`, `ec2-resume`, etc.                   |
 | 8  | Persiste config del skill             | `~/.config/ec2-remote-access/config.env`                |
 | 9  | Smoke test final                      | Te dice exactamente qué tecleas para entrar             |
-
----
-
-## 🛠️ Aliases que crea
-
-| Comando         | Para qué                                                       |
-|-----------------|----------------------------------------------------------------|
-| `ec2`           | Sesión Claude Code remota nueva                                |
-| `ec2-tmux` ⭐    | Sesión persistente — sobrevive cierres de laptop / WiFi caído  |
-| `ec2-continue`  | Retomar la sesión más reciente                                 |
-| `ec2-resume`    | Menú de todas las sesiones previas                             |
-| `ec2-shell`     | Solo terminal del EC2 (sin Claude)                             |
-| `ec2-tmux-2/3`  | Sesiones tmux paralelas independientes                         |
 
 ---
 
