@@ -32,8 +32,8 @@ fi
 
 mkdir -p "${SKILL_DIR}"
 
-# Fetch SKILL.md + README.md (the only files this skill needs)
-for f in SKILL.md README.md; do
+# Fetch all skill files
+for f in SKILL.md README.md TROUBLESHOOTING.md CHANGELOG.md; do
   echo "  → ${f}"
   if ! curl -fsSL "${RAW}/${f}" -o "${SKILL_DIR}/${f}"; then
     echo "❌ Failed to fetch ${f} from ${RAW}/${f}"
